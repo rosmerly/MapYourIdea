@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mapsyour Idea</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 100vh; width: 100vw; }
+    body { margin: 0; padding: 0; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Crear el mapa y establecer una vista inicial
+    const map = L.map('map').setView([0, 0], 13);
+
+    // Añadir capa base de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Obtener ubicación del usuario
+   navigator.geolocation.getCurrentPosition(position => {
+   const lat = position.coords.latitude;
+   const lon = position.coords.longitude;
+
+  console.log("Latitud:", lat, "Longitud:", lon);
+
+   map.setView([lat, lon], 15);
+
+   // Marcador de ubicación del usuario
+   L.marker([lat, lon]).addTo(map)
+    .bindPopup('Estás aquí').openPopup();
+   }, error => {
+   alert('No se pudo obtener tu ubicación: ' + error.message);
+   }, {
+   enableHighAccuracy: true,
+    timeout: 10000,
+  maximumAge: 0
+   });
+
+    // Permitir agregar marcadores personalizados al hacer clic
+    map.on('click', function(e) {
+      const latlng = e.latlng;
+      const descripcion = prompt("Describe este lugar de interés:");
+      if (descripcion) {
+        L.marker([latlng.lat, latlng.lng]).addTo(map)
+          .bindPopup(descripcion).openPopup();
+      }
+    });
+  </script>
+</body>
+</html>
