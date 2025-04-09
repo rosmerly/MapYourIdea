@@ -1,13 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Mapsyour Idea</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mapa interactivo</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <style>
-    #map { height: 100vh; width: 100vw; }
-    body { margin: 0; padding: 0; }
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+    .region-highlight {
+      fill: #2ecc71;
+      fill-opacity: 0.5;
+      color: #27ae60;
+      weight: 2;
+    }
   </style>
 </head>
 <body>
@@ -15,43 +23,44 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    // Crear el mapa y establecer una vista inicial
-    const map = L.map('map').setView([0, 0], 13);
+    // Inicializa el mapa
+    const map = L.map('map').setView([36.25, -6.03], 11);
 
-    // Añadir capa base de OpenStreetMap
+    // Carga de mapa base
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // Obtener ubicación del usuario
-   navigator.geolocation.getCurrentPosition(position => {
-   const lat = position.coords.latitude;
-   const lon = position.coords.longitude;
-
-  console.log("Latitud:", lat, "Longitud:", lon);
-
-   map.setView([lat, lon], 15);
-
-   // Marcador de ubicación del usuario
-   L.marker([lat, lon]).addTo(map)
-    .bindPopup('Estás aquí').openPopup();
-   }, error => {
-   alert('No se pudo obtener tu ubicación: ' + error.message);
-   }, {
-   enableHighAccuracy: true,
-    timeout: 10000,
-  maximumAge: 0
-   });
-
-    // Permitir agregar marcadores personalizados al hacer clic
-    map.on('click', function(e) {
-      const latlng = e.latlng;
-      const descripcion = prompt("Describe este lugar de interés:");
-      if (descripcion) {
-        L.marker([latlng.lat, latlng.lng]).addTo(map)
-          .bindPopup(descripcion).openPopup();
+    // Datos de regiones (centros aproximados)
+    const regiones = [
+      {
+        nombre: "Conil",
+        coords: [36.2785, -6.0887]
+      },
+      {
+        nombre: "El Palmar",
+        coords: [36.2156, -6.0722]
+      },
+      {
+        nombre: "Zahara de los Atunes",
+        coords: [36.1361, -5.8401]
       }
+    ];
+
+    // Crear círculos como áreas seleccionables
+    regiones.forEach(region => {
+      const circulo = L.circle(region.coords, {
+        radius: 2000,
+        className: 'region-highlight'
+      }).addTo(map);
+
+      circulo.on('click', () => {
+        alert("Has seleccionado: " + region.nombre);
+      });
+
+      L.marker(region.coords).addTo(map).bindPopup(region.nombre);
     });
   </script>
 </body>
 </html>
+
